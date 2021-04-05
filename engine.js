@@ -13,7 +13,7 @@ var filter = function(array) {
 
 var headerLength = function(answers) {
   return (
-    answers.type.length + 2 + (answers.scope ? answers.scope.length + 2 : 0)
+    answers.workItem.length + 3 + answers.type.length + 2 + (answers.scope ? answers.scope.length + 2 : 0)
   );
 };
 
@@ -68,6 +68,19 @@ module.exports = function(options) {
       // You can also opt to use another input
       // collection library if you prefer.
       cz.prompt([
+        {
+          type: 'input',
+          name: 'workItem',
+          message: "What is the card board number: (without #)",
+          validate: function(value) {
+            var pass = value.match(/^[0-9]*$/)
+            if (pass) {
+              return true;
+            }
+
+            return 'Please enter a valid story code or task code number';
+          }
+        },
         {
           type: 'list',
           name: 'type',
@@ -159,34 +172,6 @@ module.exports = function(options) {
             return answers.isBreaking;
           }
         },
-
-        {
-          type: 'confirm',
-          name: 'isIssueAffected',
-          message: 'Does this change affect any open issues?',
-          default: options.defaultIssues ? true : false
-        },
-        {
-          type: 'input',
-          name: 'issuesBody',
-          default: '-',
-          message:
-            'If issues are closed, the commit requires a body. Please enter a longer description of the commit itself:\n',
-          when: function(answers) {
-            return (
-              answers.isIssueAffected && !answers.body && !answers.breakingBody
-            );
-          }
-        },
-        {
-          type: 'input',
-          name: 'issues',
-          message: 'Add issue references (e.g. "fix #123", "re #123".):\n',
-          when: function(answers) {
-            return answers.isIssueAffected;
-          },
-          default: options.defaultIssues ? options.defaultIssues : undefined
-        }
       ]).then(function(answers) {
         var wrapOptions = {
           trim: true,
@@ -200,7 +185,7 @@ module.exports = function(options) {
         var scope = answers.scope ? '(' + answers.scope + ')' : '';
 
         // Hard limit this line in the validate
-        var head = answers.type + scope + ': ' + answers.subject;
+        var head = '#' + String(answers.workItem) + ' - ' + answers.type + scope + ': ' + answers.subject;
 
         // Wrap these lines at options.maxLineWidth characters
         var body = answers.body ? wrap(answers.body, wrapOptions) : false;
@@ -212,9 +197,8 @@ module.exports = function(options) {
           : '';
         breaking = breaking ? wrap(breaking, wrapOptions) : false;
 
-        var issues = answers.issues ? wrap(answers.issues, wrapOptions) : false;
-
-        commit(filter([head, body, breaking, issues]).join('\n\n'));
+        console.log(filter([head, body, breaking]).join('\n\n'))
+        commit(filter([head, body, breaking]).join('\n\n'));
       });
     }
   };
