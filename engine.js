@@ -13,7 +13,7 @@ var filter = function(array) {
 
 var headerLength = function(answers) {
   return (
-    answers.workItem.length + 3 + answers.type.length + 2 + (answers.scope ? answers.scope.length + 2 : 0)
+    answers.workItem.length + 2 + answers.type.length + 2 + (answers.scope ? answers.scope.length + 2 : 0)
   );
 };
 
@@ -73,7 +73,7 @@ module.exports = function(options) {
           name: 'workItem',
           message: "What is the card board number: (without #)",
           validate: function(value) {
-            var pass = value.match(/^[0-9]*$/)
+            var pass = value.match(/^\d+$/)
             if (pass) {
               return true;
             }
