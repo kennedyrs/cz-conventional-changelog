@@ -197,7 +197,6 @@ module.exports = function(options) {
           : '';
         breaking = breaking ? wrap(breaking, wrapOptions) : false;
 
-        console.log(filter([head, body, breaking]).join('\n\n'))
         commit(filter([head, body, breaking]).join('\n\n'));
       });
     }
